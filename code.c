@@ -73,5 +73,28 @@ int execute(char **args){
 		return (commd_cd)(args);
 	return fork_launch(args);
 }
+//-----------------------------------------------------
+//------------------------------------------------------
+int main()
+{
+	char** args;
+	int status;
+	char* line = NULL;	
+	while(status){
+		//print prompt string
+		//read command from stdin
+		printf("$$> ");
+		line = lsh_read_line();
+		//parse command - exit if quit
+		args = split_line(line);
+			// use ...execute to run the command
+		status = execute(args);
+		free(args);free(line);
+	}
+	return EXIT_SUCCESS;
+}
+
+///////////////////////////////////////////////////////
+
 
 

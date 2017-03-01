@@ -4,19 +4,25 @@
 #include <stdio.h>
 #include <string.h>
 #include <signal.h>
-//#include <unipipc.h>
+
 #define BUFF_SIZE 1024
 #define BUFF_TOK 64
 #define DELIMITERS " \n\r\t\a"
+
 char *hist[50];
 int current =0;
-  
-char *builtin_str[] = { "cd","help","exit","history","kill"};
 //==============================================================
+
 void sighandler(int signum){ printf("\nInvalid input! Press enter to continue\n");return;}
+
 //=======================================================
+
+char *builtin_str[] = { "cd","help","exit","history","kill"};
+
 int Exitt(char **args){ return 0;}
-//==========================================
+
+//==============================================================
+
 int chngDir(char **args)
 {
     if (args[1] == NULL) {
@@ -25,6 +31,7 @@ int chngDir(char **args)
             perror("Error");
     return 1;
 }
+//=================================================================
 int killl(char **args){
     if(args[1]==NULL){
         fprintf(stderr, "Enter the pid of the process you wish to kill.\n");
@@ -34,7 +41,9 @@ int killl(char **args){
     kill(pid,SIGKILL);
     return 1;
 }
-//===========================================================
+
+//====================================================================
+
 int Help(char **args)
 {
   int i;
@@ -50,7 +59,9 @@ int Help(char **args)
   printf("Use the man command for information on other programs.\n");
   return 1;
 }
+
 //=======================================================
+
 int history(char **args)
 {
     int i = current;
@@ -66,8 +77,9 @@ int history(char **args)
     return 1;
 }
 
-int (*builtin_func[]) (char **) = { &chngDir,&Help,&Exitt,&history,&killl};
+
 //========================================================
+
 int clear_history(char *hist[])
 {
     int i;
@@ -77,6 +89,10 @@ int clear_history(char *hist[])
     }
     return 1;
 }
+//===================================================================
+
+int (*builtin_func[]) (char **) = { &chngDir,&Help,&Exitt,&history,&killl};
+
 //==============================================================
 int lsh_launch(char **args)
 {

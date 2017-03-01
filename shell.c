@@ -77,7 +77,6 @@ int history(char **args)
     return 1;
 }
 
-
 //========================================================
 
 int clear_history(char *hist[])
@@ -94,6 +93,7 @@ int clear_history(char *hist[])
 int (*builtin_func[]) (char **) = { &chngDir,&Help,&Exitt,&history,&killl};
 
 //==============================================================
+
 int lsh_launch(char **args)
 {
     pid_t pid, wpid;
@@ -115,6 +115,7 @@ int lsh_launch(char **args)
 }
 
 //===================================================
+
 int lsh_execute(char **args)
 {
     int i;
@@ -128,30 +129,37 @@ int lsh_execute(char **args)
 
     return lsh_launch(args);
 }
+
 //============================================================
+
 char *lsh_read_line(void)
 {
+    int position = 0,c;
     int bufsize = BUFF_SIZE;
-    int position = 0;
     char *buffer = malloc(sizeof(char) * bufsize);
-    int c;
 
-    if (!buffer) {
+    if (!buffer) 
+    {
         fprintf(stderr, "Error while allocating space\n");
         exit(EXIT_FAILURE);
     }
-    while (1) {
+    while (1) 
+    {
         c = getchar();
-        if (c == EOF || c == '\n') {
+        if (c == EOF || c == '\n') 
+        {
             buffer[position] = '\0';
             return buffer;
-        } else 
+        } 
+        else 
             buffer[position] = c;
         position++;
-        if (position >= bufsize) {
+        if (position >= bufsize) 
+        {
             bufsize += BUFF_SIZE;
             buffer = realloc(buffer, bufsize);
-            if (!buffer) {
+            if (!buffer) 
+            {
                 fprintf(stderr, "Error while allocating space\n");
                 exit(EXIT_FAILURE);
             }
@@ -160,47 +168,6 @@ char *lsh_read_line(void)
 }
 
 //===============================================================
-/*int spawn_proc (int in, int out, struct command *cmd)
-{
-  pid_t pid;
-  if ((pid = fork ()) == 0)
-    {
-      if (in != 0)
-        {
-          dup2 (in, 0);
-          close (in);
-        }
-
-      if (out != 1)
-        {
-          dup2 (out, 1);
-          close (out);
-        }
-      return execvp (cmd->argv [0], (char * const *)cmd->argv);
-    }
-  return pid;
-}
-//=========================================================
-
-int fork_pipes (int n, struct command *cmd)
-{
-  int i;
-  pid_t pid;
-  int in, fd [2];
-  in = 0;
-  for (i = 0; i < n - 1; ++i)
-    {
-      pipe (fd);
-      spawn_proc (in, fd [1], cmd + i);
-      close (fd [1]);
-      in = fd [0];
-    }
-  if (in != 0)
-    dup2 (in, 0);
-  return execvp (cmd [i].argv [0], (char * const *)cmd [i].argv);
-}
-*/
-//========================================================
 char **lsh_split_line(char *line)
 {
     hist[current]= strdup(line);
@@ -208,30 +175,36 @@ char **lsh_split_line(char *line)
     int bufsize = BUFF_TOK, position = 0;
     char **tokens = malloc(bufsize * sizeof(char*));
     char *token;
-    if (!tokens){
-      fprintf(stderr, "Error while allocating space\n");
-      exit(EXIT_FAILURE);
+    if (!tokens)
+    {
+        fprintf(stderr, "Error while allocating space\n");
+        exit(EXIT_FAILURE);
     }
 
     token = strtok(line, DELIMITERS);
-    while (token != NULL) {
+    while (token != NULL) 
+    {
         tokens[position] = token;
         position++;
 
-        if (position >= bufsize) {
+        if (position >= bufsize) 
+        {
             bufsize += BUFF_TOK;
             tokens = realloc(tokens, bufsize * sizeof(char*));
-            if (!tokens) {
-              fprintf(stderr, "Error while allocating space\n");
-              exit(EXIT_FAILURE);
+            if (!tokens) 
+            {
+                fprintf(stderr, "Error while allocating space\n");
+                exit(EXIT_FAILURE);
             }
         }
 
-      token = strtok(NULL, DELIMITERS);
+        token = strtok(NULL, DELIMITERS);
     }
     tokens[position] = NULL;
     return tokens;
 }
+
+//========================================================
 
 int main(int argc, char **argv)
 {
@@ -249,7 +222,10 @@ int main(int argc, char **argv)
 
         free(line);
         free(args);
+
     } while (status);
+    
     printf("GoodBye ! :) \n");
+    
     return EXIT_SUCCESS;
 }

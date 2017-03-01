@@ -203,7 +203,6 @@ char **lsh_split_line(char *line)
     tokens[position] = NULL;
     return tokens;
 }
-
 //========================================================
 
 int main(int argc, char **argv)

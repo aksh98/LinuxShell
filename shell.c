@@ -11,9 +11,10 @@
 char *hist[10];
 int current =0;
   
-char *builtin_str[] = { "cd","help","exit","history"};//,"kill"
+char *builtin_str[] = { "cd","help","exit","history"};
 //==============================================================
-void sighandler(int signum){ printf("\nInvalid! Press enter to continue\n");return;}
+void sighandler(int signum){ 
+    printf("\n$MyShell-> ");fflush(stdout);return;}
 //=======================================================
 int Exitt(char **args){ return 0;}
 //==========================================
@@ -25,15 +26,6 @@ int chngDir(char **args)
             perror("Error");
     return 1;
 }
-/*int killl(char **args){
-    if(args[1]==NULL){
-        fprintf(stderr, "Enter the pid of the process you wish to kill.\n");
-        return 1;
-    }
-    int pid = atoi(args[1]);
-    kill(pid,SIGKILL);
-    return 1;
-}*/
 //===========================================================
 int Help(char **args)
 {
@@ -78,8 +70,17 @@ int clear_history(char *hist[])
     return 1;
 }
 //==============================================================
-int launch(char **args)
+//===================================================
+int execute(char **args)
 {
+    int i;
+    if (!args[0])
+       return 1;
+    for (i = 0; i < 5; i++) {
+        if (strcmp(args[0], builtin_str[i]) == 0) {
+            return (*builtin_func[i])(args);
+      }
+    }
     pid_t pid, wpid;
     int status;
     pid = fork();
@@ -95,23 +96,7 @@ int launch(char **args)
                 wpid = waitpid(pid, &status, WUNTRACED);
             }while (!WIFSIGNALED(status) && !WIFEXITED(status));
     }
-    //execvp(args[0],args);
     return 1;
-}
-
-//===================================================
-int execute(char **args)
-{
-    int i;
-    if (!args[0])
-       return 1;
-    for (i = 0; i < 5; i++) {
-        if (strcmp(args[0], builtin_str[i]) == 0) {
-            return (*builtin_func[i])(args);
-      }
-    }
-
-    return launch(args);
 }
 //============================================================
 char *read_line(void)
@@ -176,6 +161,7 @@ char **split_line(char *line)
     tokens[position] = NULL;
     return tokens;
 }
+//========================================================
 
 int main(int argc, char **argv)
 {
@@ -184,15 +170,37 @@ int main(int argc, char **argv)
         hist[i] = NULL;
     signal(SIGINT, sighandler);
     char *line,**args;
-    int status;
-    do {
-        printf("$MyShell-> ");
-        line = read_line();
-        args = split_line(line);
-        status = execute(args);
+    int cmdcount,status,splitbypipe[20];
 
-        free(line);
-        free(args);
+    pid_t pid;
+    do {
+        int link[2];
+        pid = fork();
+        pipe(link);
+        if(pid == -1){
+            printf("Error while Forking\n");
+            exit(1);
+        }
+        if(pid==0)
+        {
+            dup2(link[1],STDOUT_FILENO);
+            close(link[0]);
+            close(link[1]);
+            execvp(args[0],args);
+            exit(0);
+        }
+        else
+        {
+            close(link[1]);
+            printf("$MyShell-> ");
+            line = read_line();
+        }
+            args = split_line(line);
+            status = execute(args);
+
+            free(line);
+            free(args);
+
     } while (status);
     execvp(args[0],args);
     printf("GoodBye ! :) \n");

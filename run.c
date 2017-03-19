@@ -7,7 +7,7 @@
 int main ()
 {
 		
-	system ("xterm -e \"/home/akarsha/Desktop/SEM4/Shell/2015010_shell_1\"");
+	system ("xterm -e \"/*complete_path*/shell.c\"");
 
 	return 0;
 
